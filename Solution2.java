@@ -18,30 +18,35 @@
  */
 class Solution2 {
     public String removeDuplicateLetters(String s) {
-        boolean[] vis = new boolean[25];
-        int[] num = new int[25];
+        boolean[] vis = new boolean[26]; // 26个字母
+        int[] num = new int[26]; // 记录每个字母的出现次数
+
+        // 统计每个字母的出现次数
         for (int i = 0; i < s.length(); i++) {
-            num[s.charAt(i) - ' ']++;
+            num[s.charAt(i) - 'a']++;
         }
 
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < s.length()+1; i++) {
+        for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
-            if (!vis[ch - ' ']) {
-                while (sb.length() > 0 && sb.charAt(sb.length() - 1) > ch) {
-                    if (num[sb.charAt(sb.length() - 1) - 'a'] > 0) {
-                        vis[sb.charAt(sb.length() - 1) - 'a'] = false;
-                        sb.deleteCharAt(sb.length() - 1);
-                    } else {
-                        break;
-                    }
-                }
-                vis[ch - 'a'] = true;
-                sb.append(ch);
+            // 每遍历一个字符，将其计数减一
+            num[ch - 'a']--;
+
+            // 如果该字符已经在结果中，跳过
+            if (vis[ch - 'a']) {
+                continue;
             }
-            num[ch - 'a'] += 1;
+
+            // 贪心：如果当前字符比结果末尾字符字典序小，且结果末尾字符在后续还会出现
+            while (sb.length() > 0 && sb.charAt(sb.length() - 1) > ch && num[sb.charAt(sb.length() - 1) - 'a'] > 0) {
+                vis[sb.charAt(sb.length() - 1) - 'a'] = false; // 标记末尾字符为未使用
+                sb.deleteCharAt(sb.length() - 1); // 删除末尾字符
+            }
+
+            // 将当前字符加入结果，并标记为已使用
+            sb.append(ch);
+            vis[ch - 'a'] = true;
         }
         return sb.toString();
     }
 }
-
